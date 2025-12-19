@@ -87,6 +87,7 @@
       font-weight:850;
       display:flex; align-items:center; justify-content:center; gap:10px;
       user-select:none;
+      transition: transform .06s ease;
     }
     .btn:active{transform: scale(.99)}
     .btn-primary{background: linear-gradient(135deg, rgba(124,58,237,.92), rgba(124,58,237,.55)); border-color: rgba(124,58,237,.55);}
@@ -186,7 +187,7 @@
       <div class="logo"><span>🎲</span></div>
       <div>
         <div style="font-size:18px">Sorteador Pro</div>
-        <div class="sub">amigo oculto • sala de aula • qualquer sorteio</div>
+        <div class="sub">amigo oculto • sala de aula • qualquer sorteio • grupos</div>
       </div>
     </div>
     <div class="badge" id="status">sem sorteio</div>
@@ -197,12 +198,12 @@
     <!-- ITENS -->
     <section class="card">
       <h2>🧾 Lista</h2>
-      <div class="sub">Adicione, edite e exclua itens. Toque para selecionar.</div>
+      <div class="sub">Adicione, edite e exclua itens. Toque para selecionar (no modo amigo oculto).</div>
 
       <div class="divider"></div>
 
       <div class="row">
-        <input id="novoNome" placeholder="Ex: Maria / Grupo 1 / Tema A / João..." />
+        <input id="novoNome" placeholder="Ex: Maria / João / Tema A..." />
         <button class="btn btn-primary tight" style="min-width:140px" id="btnAdd">➕ Adicionar</button>
       </div>
 
@@ -225,7 +226,7 @@
     <!-- MODO / SORTEIO -->
     <section class="card">
       <h2>🎯 Modo do sorteio</h2>
-      <div class="sub">Escolha o tipo: amigo oculto, sorteio simples ou ordem aleatória.</div>
+      <div class="sub">Agora tem também <b>Grupos aleatórios</b>. Selecione o modo, clique GERAR e depois REVELAR.</div>
 
       <div class="divider"></div>
 
@@ -235,8 +236,9 @@
           <option value="simples">Sorteio simples (1 ganhador)</option>
           <option value="multi">Sorteio multi (N ganhadores)</option>
           <option value="ordem">Ordem aleatória (embaralhar lista)</option>
+          <option value="grupos">Grupos aleatórios (tamanho X)</option>
         </select>
-        <input id="qtd" type="number" min="1" value="3" title="Quantidade (modo multi)" />
+        <input id="qtd" type="number" min="1" value="3" title="Qtd ganhadores (modo multi) / tamanho do grupo (modo grupos)" />
       </div>
 
       <div class="divider"></div>
@@ -256,6 +258,7 @@
         <div class="row">
           <button class="btn btn-primary" id="btnRevelar" disabled>👀 REVELAR</button>
           <button class="btn btn-ghost" id="btnOcultar" disabled>🧼 OCULTAR / PRÓXIMO</button>
+          <button class="btn btn-ghost" id="btnCopiar" disabled>📋 COPIAR</button>
         </div>
 
         <div class="result" id="resultado">Aguardando…</div>
@@ -270,7 +273,7 @@
 <script>
 (() => {
   // ---------- Storage ----------
-  const KEY = "sorteador_pro_v1";
+  const KEY = "sorteador_pro_v2_grupos";
   const saveState = () => {
     const data = {
       names,
@@ -305,7 +308,9 @@
   let revealed = new Set();
   let drawReady = false;
 
-  const faces = ["🎁","✨","🎄","🎅","🧦","🦌","🍬","⭐","🔔","🎀","🎯","🏆","🎲","🧠"];
+  let lastCopyText = "";
+
+  const faces = ["🎁","✨","🎄","🎅","🧦","🦌","🍬","⭐","🔔","🎀","🎯","🏆","🎲","🧠","🧩"];
 
   // ---------- Elements ----------
   const statusEl = document.getElementById("status");
@@ -323,6 +328,7 @@
   const btnGerar = document.getElementById("btnGerar");
   const btnRevelar = document.getElementById("btnRevelar");
   const btnOcultar = document.getElementById("btnOcultar");
+  const btnCopiar = document.getElementById("btnCopiar");
 
   const novoNomeEl = document.getElementById("novoNome");
   const kTotal = document.getElementById("kTotal");
@@ -399,26 +405,36 @@
       chipsEl.appendChild(chip);
     });
 
-    // Modo: no amigo oculto precisa selecionar para revelar; nos outros modos não.
     const mode = modoEl.value;
+
+    // No modo amigo precisa selecionar para revelar; nos demais não.
     const canReveal = drawReady && (mode !== "amigo" || !!selected);
     btnRevelar.disabled = !canReveal;
     btnOcultar.disabled = !drawReady;
+    btnCopiar.disabled = !lastCopyText;
 
     // hint
     if(mode === "amigo"){
       hintEl.textContent = "Modo Amigo: selecione seu nome e clique REVELAR.";
+      qtdEl.title = "Quantidade (somente no modo multi)";
     } else if(mode === "simples"){
       hintEl.textContent = "Sorteio simples: clique REVELAR para sortear 1 ganhador.";
+      qtdEl.title = "Não usado neste modo";
     } else if(mode === "multi"){
       hintEl.textContent = "Sorteio multi: clique REVELAR para sortear N ganhadores.";
-    } else {
+      qtdEl.title = "Quantidade de ganhadores (N)";
+    } else if(mode === "ordem"){
       hintEl.textContent = "Ordem aleatória: clique REVELAR para embaralhar e mostrar a ordem.";
+      qtdEl.title = "Não usado neste modo";
+    } else {
+      hintEl.textContent = "Grupos aleatórios: escolha o tamanho do grupo e clique REVELAR.";
+      qtdEl.title = "Tamanho do grupo (ex: 2, 3, 4...)";
     }
 
-    // qtd só faz sentido no multi
-    qtdEl.style.opacity = (mode === "multi") ? "1" : ".55";
-    qtdEl.disabled = (mode !== "multi");
+    // Qtd editável no multi e grupos; “cinza” nos outros
+    const usesQtd = (mode === "multi" || mode === "grupos");
+    qtdEl.style.opacity = usesQtd ? "1" : ".55";
+    qtdEl.disabled = !usesQtd;
 
     updateKPIs();
     saveState();
@@ -473,6 +489,7 @@
     pairs = {};
     revealed = new Set();
     drawReady = false;
+    lastCopyText = "";
     setStatus("sem sorteio");
     resEl.className="result";
     resEl.textContent="Aguardando…";
@@ -494,16 +511,27 @@
     pairs = {};
     revealed = new Set();
     selected = null;
+    lastCopyText = "";
     setStatus("sem sorteio");
     resEl.className="result";
     resEl.textContent = message || "Gere o sorteio.";
+  }
+
+  // ---------- Random helpers ----------
+  function shuffle(arr){
+    const a = [...arr];
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
   }
 
   // ---------- Draw logic ----------
   function makeDerangement(list){
     // used for amigo oculto
     for(let t=0;t<8000;t++){
-      const s = [...list].sort(()=>Math.random()-0.5);
+      const s = shuffle(list);
       let ok = true;
       for(let i=0;i<list.length;i++){
         if(list[i] === s[i]) { ok=false; break; }
@@ -568,6 +596,7 @@
       drawReady = true;
       revealed = new Set();
       selected = null;
+      lastCopyText = "";
       setStatus("feito ✅");
       resEl.textContent = "Sorteio de amigo oculto pronto. Selecione seu nome e REVELE.";
       confettiBoom();
@@ -576,6 +605,7 @@
       drawReady = true;
       revealed = new Set();
       selected = null;
+      lastCopyText = "";
       setStatus("pronto ✅");
       resEl.textContent = "Pronto. Clique REVELAR para ver o resultado do modo escolhido.";
       confettiBoom();
@@ -586,11 +616,12 @@
   }
 
   function revealSimple(){
-    // 1 ganhador
     const winner = names[Math.floor(Math.random()*names.length)];
+    lastCopyText = `Ganhador(a): ${winner}`;
     resEl.className="result ok";
     resEl.innerHTML = `🏆 <b>Ganhador(a):</b><br><br><span style="font-size:22px;font-weight:900">${winner}</span>`;
     confettiBoom();
+    render();
   }
 
   function revealMulti(){
@@ -598,19 +629,52 @@
     if(isNaN(n) || n<1) n = 1;
     n = Math.min(n, names.length);
 
-    const shuffled = [...names].sort(()=>Math.random()-0.5);
+    const shuffled = shuffle(names);
     const winners = shuffled.slice(0, n);
 
+    lastCopyText = `Ganhadores (${n}):\n- ` + winners.join("\n- ");
     resEl.className="result ok";
     resEl.innerHTML = `🏆 <b>${n} ganhador(es):</b><br><br>${winners.map(w=>`• <b>${w}</b>`).join("<br>")}`;
     confettiBoom();
+    render();
   }
 
   function revealOrder(){
-    const order = [...names].sort(()=>Math.random()-0.5);
+    const order = shuffle(names);
+    lastCopyText = `Ordem sorteada:\n` + order.map((w,i)=>`${i+1}. ${w}`).join("\n");
     resEl.className="result ok";
     resEl.innerHTML = `📋 <b>Ordem sorteada:</b><br><br>${order.map((w,i)=>`${i+1}. <b>${w}</b>`).join("<br>")}`;
     confettiBoom();
+    render();
+  }
+
+  function revealGroups(){
+    let size = parseInt(qtdEl.value || "2", 10);
+    if(isNaN(size) || size < 2) size = 2;
+    if(size > names.length) size = names.length;
+
+    const list = shuffle(names);
+    const groups = [];
+    for(let i=0;i<list.length;i+=size){
+      groups.push(list.slice(i, i+size));
+    }
+
+    lastCopyText =
+      `Grupos (tamanho ${size})\n\n` +
+      groups.map((g, i)=>`Grupo ${i+1} (${g.length}):\n- ${g.join("\n- ")}\n`).join("\n");
+
+    resEl.className="result ok";
+    resEl.innerHTML =
+      `🧩 <b>Grupos gerados (tamanho ${size}):</b><br><br>` +
+      groups.map((g,i)=>(
+        `<div style="margin:10px 0; padding:10px 12px; border:1px solid rgba(255,255,255,.12); border-radius:14px; background: rgba(0,0,0,.10)">
+          <b>Grupo ${i+1} (${g.length})</b><br>
+          ${g.map(x=>`• <b>${x}</b>`).join("<br>")}
+        </div>`
+      )).join("");
+
+    confettiBoom();
+    render();
   }
 
   function revelar(){
@@ -634,6 +698,7 @@
         return;
       }
       const friend = pairs[selected];
+      lastCopyText = `${selected} tirou: ${friend}`;
       resEl.className="result ok";
       resEl.innerHTML = `<b>${selected}</b>, seu amigo oculto é:<br><br>🎁 <span style="font-size:20px;font-weight:900">${friend}</span>`;
       revealed.add(selected);
@@ -644,7 +709,8 @@
 
     if(mode === "simples") return revealSimple();
     if(mode === "multi") return revealMulti();
-    return revealOrder();
+    if(mode === "ordem") return revealOrder();
+    return revealGroups();
   }
 
   function ocultar(){
@@ -652,6 +718,22 @@
     resEl.textContent = "Oculto. Próximo!";
     selected = null;
     render();
+  }
+
+  async function copiar(){
+    if(!lastCopyText) return toastRight("Nada para copiar ainda 🙂");
+    try{
+      await navigator.clipboard.writeText(lastCopyText);
+      toastRight("Copiado ✅");
+    }catch(e){
+      const ta = document.createElement("textarea");
+      ta.value = lastCopyText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      toastRight("Copiado ✅");
+    }
   }
 
   // ---------- Events ----------
@@ -664,6 +746,7 @@
   btnGerar.addEventListener("click", gerar);
   btnRevelar.addEventListener("click", revelar);
   btnOcultar.addEventListener("click", ocultar);
+  btnCopiar.addEventListener("click", copiar);
 
   modoEl.addEventListener("change", () => {
     invalidateDraw("Modo mudou. Clique GERAR.");
@@ -674,14 +757,13 @@
   if(!loadState()){
     loadExample();
   } else {
-    // se carregar do storage e tiver modo, deixa consistente
     resEl.className = "result";
     resEl.textContent = drawReady ? "Pronto. Clique REVELAR." : "Clique GERAR.";
     setStatus(drawReady ? "pronto ✅" : "sem sorteio");
   }
   render();
 
-  // ---------- Service Worker register (CORRETO) ----------
+  // ---------- Service Worker register ----------
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js").catch(()=>{});
   }
