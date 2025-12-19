@@ -1,247 +1,192 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Sorteador Pro ✨</title>
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#7c3aed">
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Amigo Oculto ✨</title>
-<style>
-  :root{
-    --bg1:#0b1220; --bg2:#111a2e;
-    --card: rgba(255,255,255,.06);
-    --card2: rgba(255,255,255,.08);
-    --stroke: rgba(255,255,255,.12);
-    --txt:#eaf0ff;
-    --muted: rgba(234,240,255,.72);
-    --accent:#7c3aed; /* roxo */
-    --accent2:#22c55e; /* verde */
-    --danger:#ef4444;
-    --warn:#f59e0b;
-    --shadow: 0 18px 60px rgba(0,0,0,.35);
-  }
+  <meta name="theme-color" content="#7c3aed">
 
-  *{box-sizing:border-box}
-  body{
-    margin:0; padding:18px;
-    font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    color: var(--txt);
-    background:
-      radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,.28), transparent 55%),
-      radial-gradient(900px 600px at 90% 25%, rgba(34,197,94,.20), transparent 55%),
-      linear-gradient(180deg, var(--bg1), var(--bg2));
-    min-height:100vh;
-  }
+  <style>
+    :root{
+      --bg1:#0b1220; --bg2:#111a2e;
+      --card: rgba(255,255,255,.06);
+      --stroke: rgba(255,255,255,.12);
+      --txt:#eaf0ff;
+      --muted: rgba(234,240,255,.72);
+      --accent:#7c3aed;
+      --accent2:#22c55e;
+      --danger:#ef4444;
+      --warn:#f59e0b;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:18px;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color: var(--txt);
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,.28), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(34,197,94,.20), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+    }
+    .wrap{max-width:980px; margin:0 auto;}
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin-bottom:14px;
+    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:900;}
+    .logo{
+      width:40px;height:40px;border-radius:14px;
+      background: linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,1));
+      box-shadow: 0 14px 34px rgba(124,58,237,.35);
+      display:grid; place-items:center;
+    }
+    .badge{
+      font-size:12px; padding:6px 10px; border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--stroke);
+      color: var(--muted);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+    }
+    @media (max-width: 860px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    h2{margin:0 0 8px; font-size:16px}
+    .sub{color:var(--muted); font-size:13px; margin-top:2px}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .row > *{flex:1}
+    .row .tight{flex:0 0 auto}
 
-  .wrap{max-width:980px; margin:0 auto;}
-  header{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:12px; margin-bottom:14px;
-  }
-  .brand{
-    display:flex; align-items:center; gap:10px;
-    font-weight:900; letter-spacing:.2px;
-  }
-  .logo{
-    width:40px;height:40px;border-radius:14px;
-    background: linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,1));
-    box-shadow: 0 14px 34px rgba(124,58,237,.35);
-    display:grid; place-items:center;
-  }
-  .logo span{filter: drop-shadow(0 8px 16px rgba(0,0,0,.35))}
-  .badge{
-    font-size:12px; padding:6px 10px; border-radius:999px;
-    background: rgba(255,255,255,.08);
-    border: 1px solid var(--stroke);
-    color: var(--muted);
-  }
+    input, button, select{
+      font-size:16px;
+      border-radius: 14px;
+      padding: 11px 12px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      color: var(--txt);
+      outline:none;
+    }
+    input::placeholder{color: rgba(234,240,255,.45)}
+    select{background: rgba(255,255,255,.06)}
+    .btn{
+      cursor:pointer;
+      font-weight:850;
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      user-select:none;
+    }
+    .btn:active{transform: scale(.99)}
+    .btn-primary{background: linear-gradient(135deg, rgba(124,58,237,.92), rgba(124,58,237,.55)); border-color: rgba(124,58,237,.55);}
+    .btn-green{background: linear-gradient(135deg, rgba(34,197,94,.92), rgba(34,197,94,.50)); border-color: rgba(34,197,94,.55);}
+    .btn-danger{background: linear-gradient(135deg, rgba(239,68,68,.92), rgba(239,68,68,.50)); border-color: rgba(239,68,68,.55);}
+    .btn-ghost{background: rgba(255,255,255,.05);}
+    .btn[disabled]{opacity:.55; cursor:not-allowed}
+    .divider{height:1px; background: rgba(255,255,255,.10); margin:12px 0}
 
-  .grid{
-    display:grid;
-    grid-template-columns: 1.15fr .85fr;
-    gap:14px;
-  }
-  @media (max-width: 860px){
-    .grid{grid-template-columns:1fr}
-  }
+    /* chips */
+    .chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
+    .chip{
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      display:flex; align-items:center; gap:10px;
+      max-width:100%;
+    }
+    .chip strong{font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 240px;}
+    .chip small{font-size:12px; color: var(--muted)}
+    .chip.selected{border-color: rgba(124,58,237,.60); background: rgba(124,58,237,.18); box-shadow: 0 0 0 4px rgba(124,58,237,.14);}
+    .chip.done{border-color: rgba(34,197,94,.45); background: rgba(34,197,94,.14);}
+    .miniBtn{
+      border:none; background: transparent; color: rgba(234,240,255,.90);
+      padding:6px 8px; border-radius: 10px; cursor:pointer;
+    }
+    .miniBtn:hover{background: rgba(255,255,255,.07)}
+    .miniBtn.del{color: rgba(239,68,68,.92)}
+    .miniBtn.edit{color: rgba(245,158,11,.95)}
 
-  .card{
-    background: var(--card);
-    border: 1px solid var(--stroke);
-    border-radius: 18px;
-    padding: 14px;
-    box-shadow: var(--shadow);
-    backdrop-filter: blur(10px);
-  }
+    /* stage */
+    .stage{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      padding: 14px;
+      position: relative;
+      overflow:hidden;
+    }
+    .stage::before{
+      content:"";
+      position:absolute; inset:-40% -20%;
+      background: radial-gradient(circle at 30% 30%, rgba(124,58,237,.26), transparent 55%),
+                  radial-gradient(circle at 70% 45%, rgba(34,197,94,.22), transparent 55%);
+      filter: blur(12px);
+    }
+    .stage > *{position:relative}
+    .wheel{display:flex; align-items:center; justify-content:center; height: 92px; margin: 10px 0 8px;}
+    .slot{
+      width: 92px; height: 92px; border-radius: 26px;
+      background: rgba(17,24,39,.65);
+      border: 1px solid rgba(255,255,255,.12);
+      display:grid; place-items:center;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      font-size: 44px;
+    }
+    .rolling .slot{animation: wobble .18s ease-in-out infinite alternate;}
+    @keyframes wobble{ from{transform: rotate(-2deg) scale(1.01)} to{transform: rotate(2deg) scale(1.03)} }
+    .hint{text-align:center; color: var(--muted); font-size: 13px;}
+    .result{
+      margin-top: 10px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      min-height: 72px;
+    }
+    .result.ok{border-color: rgba(34,197,94,.40); background: rgba(34,197,94,.10)}
+    .result.bad{border-color: rgba(239,68,68,.45); background: rgba(239,68,68,.10)}
+    .confetti{ position:absolute; inset:0; pointer-events:none; overflow:hidden;}
+    .confetti i{
+      position:absolute; width:10px; height:16px; border-radius:4px;
+      opacity:.95;
+      animation: fall 1100ms linear forwards;
+    }
+    @keyframes fall{ to{ transform: translateY(120vh) rotate(520deg);} }
 
-  h2{margin:0 0 8px; font-size:16px}
-  .sub{color:var(--muted); font-size:13px; margin-top:2px}
-  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-  .row > *{flex:1}
-  .row .tight{flex:0 0 auto}
-
-  input, button{
-    font-size:16px;
-    border-radius: 14px;
-    padding: 11px 12px;
-    border: 1px solid var(--stroke);
-    background: rgba(255,255,255,.06);
-    color: var(--txt);
-    outline:none;
-  }
-  input::placeholder{color: rgba(234,240,255,.45)}
-  input:focus{border-color: rgba(124,58,237,.55); box-shadow: 0 0 0 4px rgba(124,58,237,.18);}
-
-  .btn{
-    cursor:pointer;
-    font-weight:850;
-    letter-spacing:.2px;
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    transition: transform .06s ease, background .2s ease, border-color .2s ease;
-    user-select:none;
-  }
-  .btn:active{transform: scale(.99)}
-  .btn-primary{
-    background: linear-gradient(135deg, rgba(124,58,237,.92), rgba(124,58,237,.55));
-    border-color: rgba(124,58,237,.55);
-  }
-  .btn-green{
-    background: linear-gradient(135deg, rgba(34,197,94,.92), rgba(34,197,94,.50));
-    border-color: rgba(34,197,94,.55);
-  }
-  .btn-danger{
-    background: linear-gradient(135deg, rgba(239,68,68,.92), rgba(239,68,68,.50));
-    border-color: rgba(239,68,68,.55);
-  }
-  .btn-ghost{
-    background: rgba(255,255,255,.05);
-  }
-  .btn[disabled]{opacity:.55; cursor:not-allowed}
-
-  .divider{height:1px; background: rgba(255,255,255,.10); margin:12px 0}
-
-  /* Chips (botões de nomes) */
-  .chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
-  .chip{
-    padding:10px 12px;
-    border-radius: 999px;
-    border:1px solid rgba(255,255,255,.14);
-    background: rgba(255,255,255,.06);
-    cursor:pointer;
-    display:flex; align-items:center; gap:10px;
-    max-width: 100%;
-  }
-  .chip strong{font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 220px;}
-  .chip small{font-size:12px; color: var(--muted)}
-  .chip.selected{
-    border-color: rgba(124,58,237,.60);
-    background: rgba(124,58,237,.18);
-    box-shadow: 0 0 0 4px rgba(124,58,237,.14);
-  }
-  .chip.done{
-    border-color: rgba(34,197,94,.45);
-    background: rgba(34,197,94,.14);
-  }
-  .chip .miniBtn{
-    border:none; background: transparent; color: rgba(234,240,255,.85);
-    padding:6px 8px; border-radius: 10px; cursor:pointer;
-  }
-  .chip .miniBtn:hover{background: rgba(255,255,255,.07)}
-  .chip .miniBtn.del{color: rgba(239,68,68,.92)}
-  .chip .miniBtn.edit{color: rgba(245,158,11,.95)}
-
-  /* Área do sorteio / “tchannn” */
-  .stage{
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,.12);
-    background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-    padding: 14px;
-    position: relative;
-    overflow:hidden;
-  }
-  .stage::before{
-    content:"";
-    position:absolute; inset:-40% -20%;
-    background: radial-gradient(circle at 30% 30%, rgba(124,58,237,.26), transparent 55%),
-                radial-gradient(circle at 70% 45%, rgba(34,197,94,.22), transparent 55%);
-    filter: blur(12px);
-  }
-  .stage > *{position:relative}
-
-  .wheel{
-    display:flex; align-items:center; justify-content:center;
-    height: 92px;
-    margin: 10px 0 8px;
-  }
-  .slot{
-    width: 92px; height: 92px; border-radius: 26px;
-    background: rgba(17,24,39,.65);
-    border: 1px solid rgba(255,255,255,.12);
-    display:grid; place-items:center;
-    box-shadow: 0 18px 40px rgba(0,0,0,.35);
-    font-size: 44px;
-    transition: transform .12s ease;
-  }
-  .rolling .slot{animation: wobble .18s ease-in-out infinite alternate;}
-  @keyframes wobble{
-    from{transform: rotate(-2deg) scale(1.01)}
-    to{transform: rotate(2deg) scale(1.03)}
-  }
-  .hint{
-    text-align:center; color: var(--muted);
-    font-size: 13px;
-  }
-
-  .result{
-    margin-top: 10px;
-    padding: 14px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,.12);
-    background: rgba(255,255,255,.05);
-    min-height: 72px;
-  }
-  .result.ok{border-color: rgba(34,197,94,.40); background: rgba(34,197,94,.10)}
-  .result.bad{border-color: rgba(239,68,68,.45); background: rgba(239,68,68,.10)}
-
-  /* confetti */
-  .confetti{ position:absolute; inset:0; pointer-events:none; overflow:hidden;}
-  .confetti i{
-    position:absolute; width:10px; height:16px; border-radius:4px;
-    opacity:.95;
-    animation: fall 1100ms linear forwards;
-  }
-  @keyframes fall{
-    to{ transform: translateY(120vh) rotate(520deg); opacity: .95;}
-  }
-
-  .kpi{
-    display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;
-  }
-  .kpi .box{
-    flex:1;
-    border-radius: 16px;
-    padding:10px 12px;
-    border:1px solid rgba(255,255,255,.12);
-    background: rgba(255,255,255,.05);
-    min-width: 140px;
-  }
-  .kpi .box b{display:block; font-size:18px}
-  .kpi .box span{color: var(--muted); font-size:12px}
-
-  .toast{
-    margin-top:10px; color: var(--muted); font-size:13px;
-  }
-</style>
+    .kpi{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+    .kpi .box{
+      flex:1; border-radius: 16px; padding:10px 12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      min-width: 140px;
+    }
+    .kpi .box b{display:block; font-size:18px}
+    .kpi .box span{color: var(--muted); font-size:12px}
+    .toast{margin-top:10px; color: var(--muted); font-size:13px;}
+  </style>
 </head>
+
 <body>
 <div class="wrap">
-
   <header>
     <div class="brand">
-      <div class="logo"><span>🎁</span></div>
+      <div class="logo"><span>🎲</span></div>
       <div>
-        <div style="font-size:18px">Amigo Oculto</div>
-        <div class="sub">bonitinho • offline • no celular</div>
+        <div style="font-size:18px">Sorteador Pro</div>
+        <div class="sub">amigo oculto • sala de aula • qualquer sorteio</div>
       </div>
     </div>
     <div class="badge" id="status">sem sorteio</div>
@@ -249,81 +194,120 @@
 
   <div class="grid">
 
-    <!-- PARTICIPANTES -->
+    <!-- ITENS -->
     <section class="card">
-      <h2>👥 Participantes</h2>
-      <div class="sub">Toque num nome para selecionar “quem você é”. Use ✏️ para editar e 🗑️ para excluir.</div>
+      <h2>🧾 Lista</h2>
+      <div class="sub">Adicione, edite e exclua itens. Toque para selecionar.</div>
 
       <div class="divider"></div>
 
       <div class="row">
-        <input id="novoNome" placeholder="Digite um nome e toque em Adicionar"/>
-        <button class="btn btn-primary tight" style="min-width:140px" onclick="adicionar()">➕ Adicionar</button>
+        <input id="novoNome" placeholder="Ex: Maria / Grupo 1 / Tema A / João..." />
+        <button class="btn btn-primary tight" style="min-width:140px" id="btnAdd">➕ Adicionar</button>
       </div>
 
       <div class="toast" id="msg"></div>
-
       <div class="chips" id="chips"></div>
 
       <div class="divider"></div>
 
       <div class="row">
-        <button class="btn btn-ghost" onclick="carregarExemplo()">✨ Carregar lista exemplo</button>
-        <button class="btn btn-danger" onclick="limparTudo()">🧨 Resetar tudo</button>
+        <button class="btn btn-ghost" id="btnExemplo">✨ Exemplo</button>
+        <button class="btn btn-danger" id="btnReset">🧨 Reset</button>
       </div>
 
       <div class="kpi">
-        <div class="box"><b id="kTotal">0</b><span>participantes</span></div>
-        <div class="box"><b id="kRevelou">0</b><span>já revelaram</span></div>
+        <div class="box"><b id="kTotal">0</b><span>itens</span></div>
+        <div class="box"><b id="kDone">0</b><span>marcados (revelados)</span></div>
       </div>
     </section>
 
-    <!-- SORTEIO / REVELAÇÃO -->
+    <!-- MODO / SORTEIO -->
     <section class="card">
-      <h2>🎲 Sorteio & Revelação</h2>
-      <div class="sub">Primeiro gere o sorteio. Depois cada pessoa seleciona seu nome e revela.</div>
+      <h2>🎯 Modo do sorteio</h2>
+      <div class="sub">Escolha o tipo: amigo oculto, sorteio simples ou ordem aleatória.</div>
 
       <div class="divider"></div>
 
-      <div class="stage" id="stage">
+      <div class="row">
+        <select id="modo">
+          <option value="amigo">Amigo oculto (ninguém tira a si mesmo)</option>
+          <option value="simples">Sorteio simples (1 ganhador)</option>
+          <option value="multi">Sorteio multi (N ganhadores)</option>
+          <option value="ordem">Ordem aleatória (embaralhar lista)</option>
+        </select>
+        <input id="qtd" type="number" min="1" value="3" title="Quantidade (modo multi)" />
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="stage">
         <div class="confetti" id="confetti"></div>
 
         <div class="row">
-          <button class="btn btn-green" id="btnGerar" onclick="gerar()">🎰 GERAR SORTEIO (tchannn)</button>
+          <button class="btn btn-green" id="btnGerar">🎰 GERAR / SORTEAR (tchannn)</button>
         </div>
 
-        <div class="wheel" id="wheel">
-          <div class="slot" id="slot">✨</div>
-        </div>
-        <div class="hint" id="hint">Selecione seu nome nos botões e toque em “REVELAR”.</div>
+        <div class="wheel" id="wheel"><div class="slot" id="slot">✨</div></div>
+        <div class="hint" id="hint">Selecione um item e clique em “REVELAR” (no modo amigo).</div>
 
         <div class="divider"></div>
 
         <div class="row">
-          <button class="btn btn-primary" id="btnRevelar" onclick="revelar()" disabled>👀 REVELAR</button>
-          <button class="btn btn-ghost" id="btnOcultar" onclick="ocultar()" disabled>🧼 OCULTAR / PRÓXIMO</button>
+          <button class="btn btn-primary" id="btnRevelar" disabled>👀 REVELAR</button>
+          <button class="btn btn-ghost" id="btnOcultar" disabled>🧼 OCULTAR / PRÓXIMO</button>
         </div>
 
         <div class="result" id="resultado">Aguardando…</div>
       </div>
 
-      <div class="toast">
-        Dica: depois que a pessoa ver, manda ela memorizar/printar e você clica em <b>OCULTAR</b>.
-      </div>
+      <div class="toast" id="toast2"></div>
     </section>
 
   </div>
 </div>
 
 <script>
-  // Estado
+(() => {
+  // ---------- Storage ----------
+  const KEY = "sorteador_pro_v1";
+  const saveState = () => {
+    const data = {
+      names,
+      selected,
+      revealed: Array.from(revealed),
+      drawReady,
+      mode: modoEl.value,
+      qtd: qtdEl.value
+    };
+    localStorage.setItem(KEY, JSON.stringify(data));
+  };
+  const loadState = () => {
+    try{
+      const raw = localStorage.getItem(KEY);
+      if(!raw) return false;
+      const data = JSON.parse(raw);
+      if(!data || !Array.isArray(data.names)) return false;
+      names = data.names;
+      selected = data.selected ?? null;
+      revealed = new Set(data.revealed || []);
+      drawReady = !!data.drawReady;
+      modoEl.value = data.mode || "amigo";
+      qtdEl.value = data.qtd || 3;
+      return true;
+    }catch(e){ return false; }
+  };
+
+  // ---------- Estado ----------
   let names = [];
   let selected = null;
   let pairs = {};
   let revealed = new Set();
   let drawReady = false;
 
-  const faces = ["🎁","✨","🎄","🎅","🧦","🦌","🍬","⭐","🔔","🎀"];
+  const faces = ["🎁","✨","🎄","🎅","🧦","🦌","🍬","⭐","🔔","🎀","🎯","🏆","🎲","🧠"];
+
+  // ---------- Elements ----------
   const statusEl = document.getElementById("status");
   const chipsEl = document.getElementById("chips");
   const msgEl = document.getElementById("msg");
@@ -331,31 +315,41 @@
   const wheelEl = document.getElementById("wheel");
   const hintEl = document.getElementById("hint");
   const resEl = document.getElementById("resultado");
+  const toast2 = document.getElementById("toast2");
+
+  const btnAdd = document.getElementById("btnAdd");
+  const btnExemplo = document.getElementById("btnExemplo");
+  const btnReset = document.getElementById("btnReset");
+  const btnGerar = document.getElementById("btnGerar");
   const btnRevelar = document.getElementById("btnRevelar");
   const btnOcultar = document.getElementById("btnOcultar");
-  const btnGerar = document.getElementById("btnGerar");
 
+  const novoNomeEl = document.getElementById("novoNome");
   const kTotal = document.getElementById("kTotal");
-  const kRevelou = document.getElementById("kRevelou");
+  const kDone = document.getElementById("kDone");
 
-  function toast(text){
+  const modoEl = document.getElementById("modo");
+  const qtdEl = document.getElementById("qtd");
+
+  // ---------- UI helpers ----------
+  const toast = (text) => {
     msgEl.textContent = text || "";
-    if(text){
-      setTimeout(()=>{ if(msgEl.textContent === text) msgEl.textContent=""; }, 2200);
-    }
-  }
+    if(text) setTimeout(()=>{ if(msgEl.textContent === text) msgEl.textContent=""; }, 2200);
+  };
+  const toastRight = (text) => {
+    toast2.textContent = text || "";
+    if(text) setTimeout(()=>{ if(toast2.textContent === text) toast2.textContent=""; }, 2600);
+  };
+  const setStatus = (t) => statusEl.textContent = t;
 
-  function updateKPIs(){
+  const updateKPIs = () => {
     kTotal.textContent = names.length;
-    kRevelou.textContent = revealed.size;
-  }
-
-  function setStatus(text){
-    statusEl.textContent = text;
-  }
+    kDone.textContent = revealed.size;
+  };
 
   function render(){
     chipsEl.innerHTML = "";
+
     names.forEach((n)=>{
       const chip = document.createElement("div");
       chip.className = "chip" +
@@ -371,7 +365,7 @@
       strong.textContent = n;
 
       const small = document.createElement("small");
-      small.textContent = revealed.has(n) ? "já revelou ✅" : "toque para selecionar";
+      small.textContent = revealed.has(n) ? "marcado ✅" : "toque para selecionar";
 
       left.appendChild(strong);
       left.appendChild(small);
@@ -405,53 +399,61 @@
       chipsEl.appendChild(chip);
     });
 
-    btnRevelar.disabled = !(drawReady && selected);
+    // Modo: no amigo oculto precisa selecionar para revelar; nos outros modos não.
+    const mode = modoEl.value;
+    const canReveal = drawReady && (mode !== "amigo" || !!selected);
+    btnRevelar.disabled = !canReveal;
     btnOcultar.disabled = !drawReady;
 
+    // hint
+    if(mode === "amigo"){
+      hintEl.textContent = "Modo Amigo: selecione seu nome e clique REVELAR.";
+    } else if(mode === "simples"){
+      hintEl.textContent = "Sorteio simples: clique REVELAR para sortear 1 ganhador.";
+    } else if(mode === "multi"){
+      hintEl.textContent = "Sorteio multi: clique REVELAR para sortear N ganhadores.";
+    } else {
+      hintEl.textContent = "Ordem aleatória: clique REVELAR para embaralhar e mostrar a ordem.";
+    }
+
+    // qtd só faz sentido no multi
+    qtdEl.style.opacity = (mode === "multi") ? "1" : ".55";
+    qtdEl.disabled = (mode !== "multi");
+
     updateKPIs();
+    saveState();
   }
 
   function selecionar(n){
     selected = (selected === n ? null : n);
     resEl.className = "result";
-    resEl.textContent = drawReady ? "Pronto. Toque em REVELAR." : "Aguardando gerar o sorteio…";
+    resEl.textContent = drawReady ? "Pronto. Toque em REVELAR." : "Gere primeiro.";
     render();
   }
 
+  // ---------- CRUD ----------
   function adicionar(){
-    const v = document.getElementById("novoNome").value.trim();
-    if(!v) return toast("Digite um nome 🙂");
-    if(names.some(x=>x.toLowerCase() === v.toLowerCase())) return toast("Esse nome já existe.");
+    const v = novoNomeEl.value.trim();
+    if(!v) return toast("Digite algo 🙂");
+    if(names.some(x=>x.toLowerCase() === v.toLowerCase())) return toast("Já existe.");
     names.push(v);
-    document.getElementById("novoNome").value = "";
-    // se já tinha sorteio, invalida (porque mudou a lista)
-    if(drawReady){
-      drawReady = false; pairs = {}; revealed = new Set(); selected=null;
-      setStatus("sem sorteio");
-      resEl.className="result";
-      resEl.textContent="Lista mudou. Gere o sorteio de novo.";
-    }
+    novoNomeEl.value = "";
+
+    if(drawReady){ invalidateDraw("Lista mudou. Gere de novo."); }
     render();
   }
 
   function editar(oldName){
-    const novo = prompt("Editar nome:", oldName);
+    const novo = prompt("Editar:", oldName);
     if(novo === null) return;
     const v = novo.trim();
     if(!v) return toast("Nome vazio não vale.");
-    if(names.some(x=>x !== oldName && x.toLowerCase() === v.toLowerCase())) return toast("Já existe outro igual.");
-    names = names.map(x => x===oldName ? v : x);
+    if(names.some(x => x !== oldName && x.toLowerCase() === v.toLowerCase())) return toast("Já existe outro igual.");
 
-    // atualizar seleção
+    names = names.map(x => x===oldName ? v : x);
     if(selected === oldName) selected = v;
 
-    // se já tinha sorteio, invalida (para não dar bug)
-    if(drawReady){
-      drawReady = false; pairs = {}; revealed = new Set(); selected=null;
-      setStatus("sem sorteio");
-      resEl.className="result";
-      resEl.textContent="Lista mudou. Gere o sorteio de novo.";
-    }
+    if(drawReady){ invalidateDraw("Lista mudou. Gere de novo."); }
     render();
   }
 
@@ -460,17 +462,12 @@
     names = names.filter(x=>x!==n);
     if(selected === n) selected = null;
 
-    if(drawReady){
-      drawReady = false; pairs = {}; revealed = new Set(); selected=null;
-      setStatus("sem sorteio");
-      resEl.className="result";
-      resEl.textContent="Lista mudou. Gere o sorteio de novo.";
-    }
+    if(drawReady){ invalidateDraw("Lista mudou. Gere de novo."); }
     render();
   }
 
-  function limparTudo(){
-    if(!confirm("Tem certeza? Isso apaga lista e sorteio.")) return;
+  function resetAll(){
+    if(!confirm("Resetar tudo?")) return;
     names = [];
     selected = null;
     pairs = {};
@@ -482,23 +479,30 @@
     render();
   }
 
-  function carregarExemplo(){
+  function loadExample(){
     names = [
       "Ernandes (filho)","Seu Ernandes (pai)","Dona Elza","Bárbara","Sara","Davi",
       "Ana Luiza","Juliana","Daniel","Théo","Elen","Álvaro","Sueli","Ferraz","Bia","Stefan"
     ];
     selected = null;
-    pairs = {};
-    revealed = new Set();
-    drawReady = false;
-    setStatus("sem sorteio");
-    resEl.className="result";
-    resEl.textContent="Lista carregada. Gere o sorteio.";
+    invalidateDraw("Exemplo carregado. Gere o sorteio.");
     render();
   }
 
+  function invalidateDraw(message){
+    drawReady = false;
+    pairs = {};
+    revealed = new Set();
+    selected = null;
+    setStatus("sem sorteio");
+    resEl.className="result";
+    resEl.textContent = message || "Gere o sorteio.";
+  }
+
+  // ---------- Draw logic ----------
   function makeDerangement(list){
-    for(let t=0;t<6000;t++){
+    // used for amigo oculto
+    for(let t=0;t<8000;t++){
       const s = [...list].sort(()=>Math.random()-0.5);
       let ok = true;
       for(let i=0;i<list.length;i++){
@@ -519,7 +523,6 @@
       p.style.left = (Math.random()*100) + "vw";
       p.style.top = (-10 - Math.random()*30) + "px";
       p.style.background = colors[Math.floor(Math.random()*colors.length)];
-      p.style.transform = `translateY(0) rotate(${Math.random()*120}deg)`;
       p.style.animationDuration = (850 + Math.random()*650) + "ms";
       p.style.width = (8 + Math.random()*8) + "px";
       p.style.height = (10 + Math.random()*14) + "px";
@@ -534,85 +537,156 @@
     const timer = setInterval(()=>{
       slotEl.textContent = faces[i % faces.length];
       i++;
-    }, 75);
-    await new Promise(r=>setTimeout(r, 1100));
+    }, 70);
+    await new Promise(r=>setTimeout(r, 1050));
     clearInterval(timer);
     wheelEl.classList.remove("rolling");
-    slotEl.textContent = "🎁";
+    slotEl.textContent = "🎲";
   }
 
   async function gerar(){
-    if(names.length < 2) return toast("Coloque pelo menos 2 participantes.");
+    const mode = modoEl.value;
+    if(names.length < 2) return toast("Coloque pelo menos 2 itens.");
+
     btnGerar.disabled = true;
     setStatus("sorteando...");
     resEl.className="result";
-    resEl.textContent="Tchannn… sorteando!";
+    resEl.textContent="Tchannn…";
     await rollAnimation();
 
-    const der = makeDerangement(names);
-    if(!der){
-      btnGerar.disabled = false;
-      setStatus("falhou");
-      resEl.className="result bad";
-      resEl.textContent="Não consegui sortear sem alguém tirar a si mesmo. Tente de novo.";
-      return;
+    if(mode === "amigo"){
+      const der = makeDerangement(names);
+      if(!der){
+        setStatus("falhou");
+        resEl.className="result bad";
+        resEl.textContent="Não consegui montar pares sem alguém tirar a si mesmo. Tente de novo.";
+        btnGerar.disabled = false;
+        return;
+      }
+      pairs = {};
+      names.forEach((n,idx)=> pairs[n] = der[idx]);
+      drawReady = true;
+      revealed = new Set();
+      selected = null;
+      setStatus("feito ✅");
+      resEl.textContent = "Sorteio de amigo oculto pronto. Selecione seu nome e REVELE.";
+      confettiBoom();
+    } else {
+      // outros modos: apenas marca pronto (revelar fará o sorteio)
+      drawReady = true;
+      revealed = new Set();
+      selected = null;
+      setStatus("pronto ✅");
+      resEl.textContent = "Pronto. Clique REVELAR para ver o resultado do modo escolhido.";
+      confettiBoom();
     }
-
-    pairs = {};
-    names.forEach((n,idx)=> pairs[n] = der[idx]);
-
-    drawReady = true;
-    revealed = new Set();
-    selected = null;
-
-    setStatus("feito ✅");
-    hintEl.textContent = "Selecione seu nome nos botões e toque em “REVELAR”.";
-    resEl.className="result";
-    resEl.textContent="Sorteio pronto. Agora é sua vez 🙂";
-    confettiBoom();
 
     btnGerar.disabled = false;
     render();
   }
 
+  function revealSimple(){
+    // 1 ganhador
+    const winner = names[Math.floor(Math.random()*names.length)];
+    resEl.className="result ok";
+    resEl.innerHTML = `🏆 <b>Ganhador(a):</b><br><br><span style="font-size:22px;font-weight:900">${winner}</span>`;
+    confettiBoom();
+  }
+
+  function revealMulti(){
+    let n = parseInt(qtdEl.value || "1", 10);
+    if(isNaN(n) || n<1) n = 1;
+    n = Math.min(n, names.length);
+
+    const shuffled = [...names].sort(()=>Math.random()-0.5);
+    const winners = shuffled.slice(0, n);
+
+    resEl.className="result ok";
+    resEl.innerHTML = `🏆 <b>${n} ganhador(es):</b><br><br>${winners.map(w=>`• <b>${w}</b>`).join("<br>")}`;
+    confettiBoom();
+  }
+
+  function revealOrder(){
+    const order = [...names].sort(()=>Math.random()-0.5);
+    resEl.className="result ok";
+    resEl.innerHTML = `📋 <b>Ordem sorteada:</b><br><br>${order.map((w,i)=>`${i+1}. <b>${w}</b>`).join("<br>")}`;
+    confettiBoom();
+  }
+
   function revelar(){
+    const mode = modoEl.value;
+
     if(!drawReady){
       resEl.className="result bad";
-      resEl.textContent="Faça o sorteio primeiro.";
-      return;
-    }
-    if(!selected){
-      resEl.className="result bad";
-      resEl.textContent="Selecione seu nome nos botões.";
-      return;
-    }
-    if(revealed.has(selected)){
-      resEl.className="result bad";
-      resEl.textContent="Esse nome já revelou ✅ (se precisar, gere um novo sorteio, mas muda tudo).";
+      resEl.textContent="Gere primeiro.";
       return;
     }
 
-    const amigo = pairs[selected];
-    resEl.className="result ok";
-    resEl.innerHTML = `<b>${selected}</b>, seu amigo oculto é:<br><br>🎁 <span style="font-size:20px;font-weight:900">${amigo}</span>`;
-    revealed.add(selected);
-    confettiBoom();
-    render();
+    if(mode === "amigo"){
+      if(!selected){
+        resEl.className="result bad";
+        resEl.textContent="Selecione seu nome primeiro.";
+        return;
+      }
+      if(revealed.has(selected)){
+        resEl.className="result bad";
+        resEl.textContent="Esse já revelou ✅";
+        return;
+      }
+      const friend = pairs[selected];
+      resEl.className="result ok";
+      resEl.innerHTML = `<b>${selected}</b>, seu amigo oculto é:<br><br>🎁 <span style="font-size:20px;font-weight:900">${friend}</span>`;
+      revealed.add(selected);
+      confettiBoom();
+      render();
+      return;
+    }
+
+    if(mode === "simples") return revealSimple();
+    if(mode === "multi") return revealMulti();
+    return revealOrder();
   }
 
   function ocultar(){
     resEl.className="result";
-    resEl.textContent = "Oculto. Próxima pessoa: selecione seu nome e revele.";
+    resEl.textContent = "Oculto. Próximo!";
     selected = null;
     render();
   }
 
-  // Inicial
-  carregarExemplo();
-  <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
+  // ---------- Events ----------
+  btnAdd.addEventListener("click", adicionar);
+  novoNomeEl.addEventListener("keydown", (e)=>{ if(e.key === "Enter") adicionar(); });
+
+  btnReset.addEventListener("click", resetAll);
+  btnExemplo.addEventListener("click", loadExample);
+
+  btnGerar.addEventListener("click", gerar);
+  btnRevelar.addEventListener("click", revelar);
+  btnOcultar.addEventListener("click", ocultar);
+
+  modoEl.addEventListener("change", () => {
+    invalidateDraw("Modo mudou. Clique GERAR.");
+    render();
+  });
+
+  // ---------- Init ----------
+  if(!loadState()){
+    loadExample();
+  } else {
+    // se carregar do storage e tiver modo, deixa consistente
+    resEl.className = "result";
+    resEl.textContent = drawReady ? "Pronto. Clique REVELAR." : "Clique GERAR.";
+    setStatus(drawReady ? "pronto ✅" : "sem sorteio");
+  }
+  render();
+
+  // ---------- Service Worker register (CORRETO) ----------
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js").catch(()=>{});
+  }
+})();
 </script>
+
 </body>
 </html>
